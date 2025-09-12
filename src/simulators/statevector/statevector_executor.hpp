@@ -895,6 +895,7 @@ cmatrix_t Executor<state_t>::density_matrix(const reg_t &qubits) {
 template <class state_t>
 void Executor<state_t>::apply_measure(const reg_t &qubits, const reg_t &cmemory,
                                       const reg_t &cregister, RngEngine &rng) {
+  std::cout << "[Executor::apply_measure] seed: " << rng.initial_seed() << "\n";
   // Actual measurement outcome
   const auto meas = sample_measure_with_prob(qubits, rng);
   // Implement measurement update
@@ -1035,10 +1036,20 @@ template <class state_t>
 std::pair<uint_t, double>
 Executor<state_t>::sample_measure_with_prob(const reg_t &qubits,
                                             RngEngine &rng) {
+  
+  std::cout << "[Executor::sample_measure_with_prob] seed: " << rng.initial_seed() << "\n";
   rvector_t probs = measure_probs(qubits);
+  std::cout << "probs: ";
+  for(const double prob: probs){
+    std::cout << prob << ";";
+  }
+  std::cout << "\n";
 
   // Randomly pick outcome and return pair
   uint_t outcome = rng.rand_int(probs);
+
+  std::cout << "rand_int outcome: " << outcome << "; probs outcome: " << probs[outcome] << "\n";
+
   return std::make_pair(outcome, probs[outcome]);
 }
 
@@ -1152,9 +1163,12 @@ Executor<state_t>::sample_measure(const reg_t &qubits, uint_t shots,
   // Generate flat register for storing
   std::vector<double> rnds;
   rnds.reserve(shots);
-
-  for (i = 0; i < shots; ++i)
+  
+  std::cout << "[Executor::sample_measure] seed: " << rng.initial_seed() << "\n";
+  for (i = 0; i < shots; ++i){
+    std::cout << "shot: " << i << " rand\n";
     rnds.push_back(rng.rand(0, 1));
+  }
 
   std::vector<double> chunkSum(Base::states_.size() + 1, 0);
   double sum, localSum;
@@ -1521,6 +1535,7 @@ Executor<state_t>::sample_measure_with_prob(CircuitExecutor::Branch &root,
   reg_t shot_branch(nshots);
 
   for (uint_t i = 0; i < nshots; i++) {
+    std::cout << "[Executor::sample_measure_with_prob] shot " << i << "\n";
     shot_branch[i] = root.rng_shots()[i].rand_int(probs);
   }
 

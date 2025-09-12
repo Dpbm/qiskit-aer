@@ -47,6 +47,7 @@ Result controller_execute(std::vector<std::shared_ptr<Circuit>> &input_circs,
     truncate = false;
 
   const size_t num_circs = input_circs.size();
+  std::cout << "[controller_execute] num_circuits: " << num_circs << "\n";
 
   // Check if parameterized circuits
   // It should be of the form
@@ -203,23 +204,33 @@ Result controller_execute(std::vector<std::shared_ptr<Circuit>> &input_circs,
   int_t seed = -1;
   uint_t seed_shift = 0;
 
-  if (config.seed_simulator.has_value())
+  if (config.seed_simulator.has_value()){
     seed = config.seed_simulator.value();
-  else
+    std::cout << "[controller_execute] it has simulator seed value: " << seed << "\n";
+  }else{
     seed = circs[0]->seed;
+    std::cout << "[controller_execute] it hasn't simulator seed value: " << seed << "\n";
+  }
 
   if (runtime_parameter_bind) {
+    std::cout << "[controller_execute] it has paramters bind\n";
+    std::cout << "------------------------------\n";
     for (auto &circ : circs) {
       circ->seed = seed + seed_shift;
+      std::cout <<  "new circuit seed: " << circ->seed << "\n";
       circ->seed_for_params.resize(circ->num_bind_params);
       for (uint_t i = 0; i < circ->num_bind_params; i++) {
         circ->seed_for_params[i] = seed + seed_shift;
+        std::cout <<  "seed for params " << i << ": " << circ->seed_for_params[i] << "\n";
         seed_shift += 2113;
       }
     }
   } else {
+    std::cout << "[controller_execute] it hasn't paramters bind\n";
+    std::cout << "------------------------------\n";
     for (auto &circ : circs) {
       circ->seed = seed + seed_shift;
+      std::cout <<  "new circuit seed: " << circ->seed << "\n";
       seed_shift += 2113;
     }
   }

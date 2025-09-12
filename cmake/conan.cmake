@@ -386,6 +386,8 @@ function(conan_cmake_install)
     set(conan_args install ${CONANFILE} ${settings} ${CONAN_ENV_VARS} ${CONAN_GENERATORS} ${CONAN_BUILD_POLICY} ${CONAN_INSTALL_UPDATE} ${CONAN_INSTALL_NO_IMPORTS} ${CONAN_OPTIONS} ${CONAN_INSTALL_FOLDER} ${ARGUMENTS_INSTALL_ARGS})
 
     string (REPLACE ";" " " _conan_args "${conan_args}")
+    # just to fix the CONAN PATH for this test
+    set(CONAN_CMD "/home/alexandre/.local/share/mise/installs/python/miniforge3-24.11.2-1/bin/conan")
     message(STATUS "Conan executing: ${CONAN_CMD} ${_conan_args}")
 
     if(ARGUMENTS_OUTPUT_QUIET)

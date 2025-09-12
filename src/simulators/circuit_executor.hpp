@@ -566,6 +566,7 @@ void Executor<state_t>::run_circuit(Circuit &circ,
                                     const Noise::NoiseModel &noise,
                                     const Config &config, const Method method,
                                     const Device device, ResultItr result_it) {
+  std::cout << "[Executor::run_circuit] running method: " << method_names_.at(method) << "\n";
   // Start individual circuit timer
   auto timer_start = myclock_t::now(); // state circuit timer
 
@@ -669,16 +670,21 @@ void Executor<state_t>::run_circuit(Circuit &circ,
       }
 
       if (noise_sampling) {
+          std::cout << "noise_sampling run circuit_shots()\n";
         run_circuit_shots(circ, noise, config, rng, result_it, true);
       } else {
         // Run multishot simulation without noise sampling
         bool can_sample = opt_circ.can_sample;
         can_sample &= check_measure_sampling_opt(opt_circ);
 
-        if (can_sample)
+        if (can_sample){
+          std::cout << "not noise_sampling, but can_sample run circuit_with_sampling()\n";
           run_circuit_with_sampling(opt_circ, config, rng, result_it);
-        else
+        }
+        else{
+          std::cout << "not noise_sampling and not can_sample run circuit_with_shots()\n";
           run_circuit_shots(opt_circ, noise, config, rng, result_it, false);
+        }
       }
     }
     for (uint_t i = 0; i < circ.num_bind_params; i++) {
@@ -833,7 +839,9 @@ void Executor<state_t>::run_circuit_shots(
   int_t par_shots = (int_t)get_max_parallel_shots(config, circ, noise);
   par_shots = std::min((int_t)parallel_shots_, par_shots);
 
+
   uint_t num_shots = circ.shots * circ.num_bind_params;
+  std::cout << "[Executor:run_circuit_shots] shots: " << num_shots << "\n";
 
   // MPI distribution settings
   std::vector<ClassicalRegister> cregs;
@@ -845,6 +853,8 @@ void Executor<state_t>::run_circuit_shots(
   }
   uint_t num_local_shots =
       shot_end[distributed_rank_] - shot_begin[distributed_rank_];
+
+  std::cout << "num_local_shots: " << num_local_shots << "\n";
 
   int max_matrix_qubits = 1;
   if (sample_noise) {
@@ -879,6 +889,7 @@ void Executor<state_t>::run_circuit_shots(
                              sample_noise, num_shots, shot_begin, &cregs,
                              init_rng, max_matrix_qubits,
                              num_local_shots](int_t i) {
+    std::cout << "{circuit_lambda} inside; i:" << i << "\n";
     state_t state;
     uint_t i_shot, e_shot;
     i_shot = num_local_shots * i / par_shots;
@@ -898,14 +909,19 @@ void Executor<state_t>::run_circuit_shots(
       RngEngine rng;
       uint_t shot_index = shot_begin[distributed_rank_] + i_shot;
       uint_t iparam = shot_index / circ.shots;
-      if (shot_index == 0 && iparam == 0)
+      if (shot_index == 0 && iparam == 0){
         rng = init_rng;
+        std::cout << "all equals zero. RNG=" << rng.initial_seed() << "\n";
+      }
       else {
         if (circ.num_bind_params > 1) {
           uint_t lid = shot_index % circ.shots;
           rng.set_seed(circ.seed_for_params[iparam] + lid);
-        } else
+          std::cout << "bind params > 1. seed_params=" << circ.seed_for_params[iparam] << "; iparam=" << iparam <<  "; lid=" << lid << "; rng=" << rng.initial_seed() << "\n";
+        } else{
+          std::cout << "bind params < 1. seed=" << circ.seed << "; shot_index=" << shot_index <<  "; rng=" << rng.initial_seed() << "\n";
           rng.set_seed(circ.seed + shot_index);
+        }
       }
       ExperimentResult &result = par_results[i][iparam];
 

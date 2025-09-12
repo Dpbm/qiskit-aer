@@ -47,12 +47,14 @@ public:
 
   // Set random seed for the RNG engine
   void set_random_seed() {
+    std::cout << "[RngEngine::set_seed] using random seed\n";
     std::random_device rd;
     set_seed(rd());
   }
 
   // Set a fixed seed for the RNG engine
   void set_seed(size_t seed) {
+    std::cout << "[RngEngine::set_seed] setting new seed for engine: " << seed << "\n";
     rng.seed(seed);
     initial_seed_ = seed;
   }

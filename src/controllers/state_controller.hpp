@@ -619,7 +619,12 @@ void AerState::assert_not_initialized() const {
   }
 };
 
-void AerState::set_random_seed() { set_seed(std::random_device()()); };
+void AerState::set_random_seed() { 
+  std::cout << "[AerState::set_random_seed] Setting seed\n";
+  set_seed(std::random_device()()); 
+  std::cout << "[AerState::set_random_seed] new seed: " << this->seed_ << "\n";
+
+};
 
 void AerState::set_seed(int_t seed) {
   seed_ = seed;
