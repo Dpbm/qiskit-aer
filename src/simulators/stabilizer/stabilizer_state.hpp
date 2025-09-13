@@ -502,8 +502,9 @@ std::vector<SampleVector> State::sample_measure(const reg_t &qubits,
   }
   std::cout << "####samples####\n";
   for(auto &s : samples){
-    std::cout << s.to_string() << "\n";
+    std::cout << s.to_string() << "; ";
   }
+  std::cout << "\n";
   return samples;
 }
 
