@@ -743,6 +743,7 @@ void Executor<state_t>::run_circuit_with_sampling(Circuit &circ,
                                                   const Config &config,
                                                   RngEngine &init_rng,
                                                   ResultItr result_it) {
+  std::cout << "[Executor::run_circuit_with_sampling] sampling with rng=" << init_rng.initial_seed() << "\n";
   // Optimize circuit
   Noise::NoiseModel dummy_noise;
   state_t dummy_state;
@@ -761,12 +762,14 @@ void Executor<state_t>::run_circuit_with_sampling(Circuit &circ,
   int_t par_shots = (int_t)get_max_parallel_shots(config, circ, dummy_noise);
   par_shots = std::min((int_t)parallel_shots_, par_shots);
   circ.shots = circ_shots;
-
+  
   num_bind_params_ = circ.num_bind_params;
+  std::cout << "[Executor::run_circuit_with_sampling] shots=" << circ_shots << "; par_shots=" << par_shots << "; bind_params=" << num_bind_params_ << "\n";
 
   auto run_circuit_lambda = [this, circ, &result_it, &fusion_result, config,
                              init_rng, max_bits, first_meas, final_ops,
                              par_shots](int_t i) {
+    std::cout << "run_circuit_lambda " << i << "\n";
     uint_t iparam, param_end;
     iparam = circ.num_bind_params * i / par_shots;
     param_end = circ.num_bind_params * (i + 1) / par_shots;
@@ -779,6 +782,7 @@ void Executor<state_t>::run_circuit_with_sampling(Circuit &circ,
         rng = init_rng;
       else
         rng.set_seed(circ.seed_for_params[iparam]);
+      std::cout << "experiment iparam=" << iparam <<  "; seed=" << rng.initial_seed() << "\n";
 
       // Set state config
       state_t state;
