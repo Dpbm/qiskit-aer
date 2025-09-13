@@ -1055,7 +1055,9 @@ void Executor<state_t>::measure_sampler(InputIterator first_meas,
                                         RngEngine &rng) const {
   // Check if meas_circ is empty, and if so return initial creg
   if (first_meas == last_meas) {
+    std::cout << "first_meas == last_meas\n";
     while (shots-- > 0) {
+      std::cout << "[measure_sampler] shot=" << shots << "\n";
       result.save_count_data(state.creg(), save_creg_memory_);
     }
     return;

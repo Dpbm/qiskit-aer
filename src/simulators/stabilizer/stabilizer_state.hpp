@@ -447,6 +447,7 @@ void State::apply_pauli(const reg_t &qubits, const std::string &pauli) {
 void State::apply_measure(const reg_t &qubits, const reg_t &cmemory,
                           const reg_t &cregister, RngEngine &rng) {
   // Apply measurement and get classical outcome
+  std::cout << "[Stabilizer::apply_measure] running measurement on qubits; seed=" << rng.initial_seed() << "\n";
   reg_t outcome = apply_measure_and_update(qubits, rng);
   // Add measurement outcome to creg
   BaseState::creg().store_measure(outcome, cmemory, cregister);
@@ -476,8 +477,14 @@ reg_t State::apply_measure_and_update(const reg_t &qubits, RngEngine &rng) {
   // Measure each qubit
   for (const auto &q : qubits) {
     uint_t r = rng.rand_int(dist);
+    std::cout << "[Stabilizer::apply_measure_and_update] seed=" << rng.initial_seed() << "; r=" << r << "; qubit=" << q << "\n";
     outcome.push_back(qreg_.measure_and_update(q, r));
   }
+  std::cout << "$$$$outcome$$$$\n";
+  for(const auto &o : outcome){
+    std::cout << o << "; ";
+  }
+  std::cout << "\n";
   return outcome;
 }
 
@@ -485,11 +492,17 @@ std::vector<SampleVector> State::sample_measure(const reg_t &qubits,
                                                 uint_t shots, RngEngine &rng) {
   // TODO: see if we can improve efficiency by directly sampling from Clifford
   // table
+  std::cout << "[Stabilizer::sample_measure] shots=" << shots << "; seed=" << rng.initial_seed() << "\n";
   auto qreg_cache = BaseState::qreg_;
   std::vector<SampleVector> samples(shots);
   for (uint_t ishot = 0; ishot < shots; ishot++) {
+    std::cout << "running shot=" << ishot << "\n";
     samples[ishot].from_vector(apply_measure_and_update(qubits, rng));
     BaseState::qreg_ = qreg_cache; // restore pre-measurement data from cache
+  }
+  std::cout << "####samples####\n";
+  for(auto &s : samples){
+    std::cout << s.to_string() << "\n";
   }
   return samples;
 }

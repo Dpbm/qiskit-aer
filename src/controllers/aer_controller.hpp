@@ -571,6 +571,7 @@ Result Controller::execute(std::vector<std::shared_ptr<Circuit>> &circuits,
 
     auto run_circuits = [this, &executors, &circuits, &noise_model, &config,
                          &methods, &result, &result_offset](int_t i) {
+      std::cout << "[Contoller::execute()] running cirucit " << i << "\n";
       executors[i]->run_circuit(*circuits[i], noise_model, config, methods[i],
                                 sim_device_,
                                 result.results.begin() + result_offset[i]);
@@ -709,6 +710,7 @@ Controller::make_circuit_executor(const Method method) const {
     }
     break;
   case Method::stabilizer: {
+    std::cout << "[Controller::make_circuit_executor] Using Stabilizer\n";
     return std::make_shared<CircuitExecutor::Executor<Stabilizer::State>>();
   } break;
   case Method::extended_stabilizer: {
