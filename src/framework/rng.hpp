@@ -53,6 +53,7 @@ public:
 
   // Set a fixed seed for the RNG engine
   void set_seed(size_t seed) {
+    std::cout << "set random seed " << seed << "...\n";
     rng.seed(seed);
     initial_seed_ = seed;
   }
