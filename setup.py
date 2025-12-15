@@ -9,7 +9,7 @@ import platform
 import setuptools
 from skbuild import setup
 
-PACKAGE_NAME = os.getenv("QISKIT_AER_PACKAGE_NAME", "qiskit-aer")
+PACKAGE_NAME = "modified-aer" #os.getenv("QISKIT_AER_PACKAGE_NAME", "qiskit-aer")
 CUDA_MAJOR = os.getenv("QISKIT_AER_CUDA_MAJOR", "12")
 
 # Allow build without the CUDA requirements. This is useful in case one intends to use a CUDA that exists in the host system.
@@ -97,7 +97,7 @@ setup(
     version=VERSION,
     packages=setuptools.find_packages(exclude=["test*"]),
     cmake_source_dir=".",
-    description="Aer - High performance simulators for Qiskit",
+    description="Aer - modified for science purposes",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/Qiskit/qiskit-aer",

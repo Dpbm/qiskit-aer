@@ -82,6 +82,7 @@ public:
   template <typename Integer,
             typename = std::enable_if_t<std::is_integral<Integer>::value>>
   Integer rand_int(Integer a, Integer b) {
+    set_random_seed();
     return std::uniform_int_distribution<Integer>(a, b)(rng);
   }
 
@@ -92,6 +93,7 @@ public:
   template <typename Float,
             typename = std::enable_if_t<std::is_floating_point<Float>::value>>
   size_t rand_int(const std::vector<Float> &probs) {
+    set_random_seed();
     return std::discrete_distribution<size_t>(probs.begin(), probs.end())(rng);
   }
 
